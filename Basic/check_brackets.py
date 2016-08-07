@@ -7,7 +7,7 @@ class Bracket:
         self.bracket_type = bracket_type
         self.position = position
 
-    def Match(self, c):
+    def match(self, c):
         if self.bracket_type == '[' and c == ']':
             return True
         if self.bracket_type == '{' and c == '}':
@@ -16,17 +16,36 @@ class Bracket:
             return True
         return False
 
+
 if __name__ == "__main__":
     text = sys.stdin.read()
 
     opening_brackets_stack = []
-    for i, next in enumerate(text):
-        if next == '(' or next == '[' or next == '{':
-            # Process opening bracket, write your code here
-            pass
+    ignore_final_check = False
+    for i, character in enumerate(text):
+        if i == len(text) - 1:
+            finished_enumeration = True
+        if character == '(' or character == '[' or character == '{':
+            # push stack
+            bracket = Bracket(character, i)
+            opening_brackets_stack.append(bracket)
+        if character == ')' or character == ']' or character == '}':
+            if len(opening_brackets_stack) == 0:
+                ignore_final_check = True
+                print(i + 1)
+                break
+            else:
+                top = opening_brackets_stack[-1]
+                del opening_brackets_stack[-1]
 
-        if next == ')' or next == ']' or next == '}':
-            # Process closing bracket, write your code here
-            pass
+                if not top.match(character):
+                    ignore_final_check = True
+                    print(i + 1)
+                    break
 
-    # Printing answer, write your code here
+    if not ignore_final_check:
+        if len(opening_brackets_stack) == 0:
+            print("Success")
+        else:
+            top = opening_brackets_stack[-1]
+            print(top.position + 1)
