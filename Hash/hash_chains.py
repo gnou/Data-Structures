@@ -1,64 +1,1 @@
-# python3
-
-class Query:
-
-    def __init__(self, query):
-        self.type = query[0]
-        if self.type == 'check':
-            self.ind = int(query[1])
-        else:
-            self.s = query[1]
-
-
-class QueryProcessor:
-    _multiplier = 263
-    _prime = 1000000007
-
-    def __init__(self, bucket_count):
-        self.bucket_count = bucket_count
-        # store all strings in one list
-        self.elems = []
-
-    def _hash_func(self, s):
-        ans = 0
-        for c in reversed(s):
-            ans = (ans * self._multiplier + ord(c)) % self._prime
-        return ans % self.bucket_count
-
-    def write_search_result(self, was_found):
-        print('yes' if was_found else 'no')
-
-    def write_chain(self, chain):
-        print(' '.join(chain))
-
-    def read_query(self):
-        return Query(input().split())
-
-    def process_query(self, query):
-        if query.type == "check":
-            # use reverse order, because we append strings to the end
-            self.write_chain(cur for cur in reversed(self.elems)
-                        if self._hash_func(cur) == query.ind)
-        else:
-            try:
-                ind = self.elems.index(query.s)
-            except ValueError:
-                ind = -1
-            if query.type == 'find':
-                self.write_search_result(ind != -1)
-            elif query.type == 'add':
-                if ind == -1:
-                    self.elems.append(query.s)
-            else:
-                if ind != -1:
-                    self.elems.pop(ind)
-
-    def process_queries(self):
-        n = int(input())
-        for i in range(n):
-            self.process_query(self.read_query())
-
-if __name__ == '__main__':
-    bucket_count = int(input())
-    proc = QueryProcessor(bucket_count)
-    proc.process_queries()
+# python3class Node:    def __init__(self, data):        self.data = data        self.next = None        self.prev = Noneclass LinkedList:    def __init__(self):        self.head = None    def add(self, data):        node = Node(data)        if self.head == None:            self.head = node        else:            node.next = self.head            node.next.prev = node            self.head = node    def search(self, k):        p = self.head        if p != None:            while p.next != None:                if (p.data == k):                    return p                p = p.next            if (p.data == k):                return p        return None    def remove(self, p):        if p.prev is None and p.next is not None:   # p is head, with more than 1 next node            self.head = p.next            self.head.prev = None        elif p.prev is not None and p.next is None:            p.prev.next = None        elif p.prev is not None and p.next is not None:            p.prev.next = p.next            p.next.prev = p.prev        elif p.prev is None and p.next is None: # p is head, and the only node            self.head = Noneclass Query:    def __init__(self, query):        self.type = query[0]        if self.type == 'check':            self.ind = int(query[1])        else:            self.s = query[1]class QueryProcessor:    _multiplier = 263    _prime = 1000000007    def __init__(self, bucket_count):        self.bucket_count = bucket_count        # Init a bucket_count size empty array        self._bucket = [None] * bucket_count    def _hash_func(self, s):        ans = 0        for c in reversed(s):            ans = (ans * self._multiplier + ord(c)) % self._prime        return ans % self.bucket_count    def write_search_result(self, was_found):        print('yes' if was_found else 'no')    def write_chain(self, chain):        print(' '.join(chain))    def read_query(self):        return Query(input().split())    def process_query(self, query):        if query.type == "check":            # if query.ind >= self.bucket_count:            #     break            linked_list = self._bucket[query.ind]            if linked_list is None:                # print(" ")                self.write_chain([])            else:                stored_strings = []                p = linked_list.head                while p != None:                    stored_strings.append(p.data)                    p = p.next                self.write_chain(stored_strings)        else:            hash_s = self._hash_func(query.s)            linked_list = self._bucket[hash_s]            if query.type == "add":                if linked_list is None:                    linked_list = LinkedList()                    linked_list.add(query.s)                    self._bucket[hash_s] = linked_list                elif linked_list.search(query.s) is None:                    linked_list.add(query.s)            elif query.type == "find":                if linked_list is None:                    self.write_search_result(False)                elif linked_list.search(query.s) is None:                    self.write_search_result(False)                elif linked_list.search(query.s) is not None:                    self.write_search_result(True)            elif query.type == "del":                if linked_list is not None:                    result_node = linked_list.search(query.s)                    if result_node is not None:                        linked_list.remove(result_node)        # if query.type == "check":        #     # use reverse order, because we append strings to the end        #     self.write_chain(cur for cur in reversed(self.elems)        #                 if self._hash_func(cur) == query.ind)        # else:        #     try:        #         ind = self.elems.index(query.s)        #     except ValueError:        #         ind = -1        #     if query.type == 'find':        #         self.write_search_result(ind != -1)        #     elif query.type == 'add':        #         if ind == -1:        #             self.elems.append(query.s)        #     else:        #         if ind != -1:        #             self.elems.pop(ind)    def process_queries(self):        n = int(input())        for i in range(n):            self.process_query(self.read_query())if __name__ == '__main__':    bucket_count = int(input())    proc = QueryProcessor(bucket_count)    proc.process_queries()
